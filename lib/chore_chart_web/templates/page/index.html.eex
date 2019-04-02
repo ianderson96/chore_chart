@@ -1,0 +1,12 @@
+<div id="root">
+  <div class="row">
+    <div class="col-12">
+      <p>Your fun chore-related adventures are loading...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+ window.chores = <%= raw Jason.encode!(@chores) %>;
+ window.users = <%= raw Jason.encode!(@users) %>;
+</script>
