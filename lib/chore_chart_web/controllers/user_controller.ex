@@ -4,7 +4,7 @@ defmodule ChoreChartWeb.UserController do
   alias ChoreChart.Users
   alias ChoreChart.Users.User
 
-  action_fallback ChoreChartWeb.FallbackController
+  action_fallback(ChoreChartWeb.FallbackController)
 
   def index(conn, _params) do
     users = Users.list_users()
@@ -12,7 +12,13 @@ defmodule ChoreChartWeb.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Users.create_user(user_params) do
+    IO.inspect(user_params, label: "params")
+    pw = Map.get(user_params, "password_hash")
+    pwhash = Argon2.hash_pwd_salt(pw)
+    new_params = Map.put(user_params, "password_hash", pwhash)
+    IO.inspect(new_params, label: "new params")
+
+    with {:ok, %User{} = user} <- Users.create_user(new_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.user_path(conn, :show, user))
