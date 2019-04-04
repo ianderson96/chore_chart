@@ -39,7 +39,8 @@ class Root extends React.Component {
       },
       user_group: {
         join_code: "",
-        group_name: ""
+        group_name: "",
+        users: []
       },
       session: null
     };
@@ -92,6 +93,19 @@ class Root extends React.Component {
           user_group: resp.data
         });
         this.setState(state1, () => this.register_user());
+      }
+    })
+  }
+
+  get_user_group(join_code) {
+    $.ajax("/api/v1/usergroups/" + join_code, {
+      method: "get",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: "",
+      success: resp => {
+        console.log(resp.data);
+        return resp.data
       }
     })
   }
@@ -149,8 +163,54 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify(this.state.login_form),
       success: resp => {
+        console.log(resp.data);
         let state1 = _.assign({}, this.state, { session: resp.data });
-        this.setState(state1);
+        this.setState(state1, () => this.fetch_current_user());
+      }
+    });
+  }
+
+  logout() {
+    return this.setState({
+      register_form: {
+        email: "",
+        full_name: "",
+        password_hash: "",
+        score: 0,
+        group_action: "join",
+        join_code: "",
+        group_name: ""
+      },
+      login_form: {
+        email: "",
+        password_hash: ""
+      },
+      user: {
+        email: "",
+        full_name: "",
+        password_hash: "",
+        score: 0,
+        user_group_join_code: ""
+      },
+      user_group: {
+        join_code: "",
+        group_name: "",
+        users: []
+      },
+      session: null
+    })
+  }
+
+  fetch_current_user() {
+    $.ajax("/api/v1/users/" + this.state.session.user_id, {
+      method: "get",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: "",
+      success: resp => {
+        let state1 = _.assign({}, this.state, { user: resp.data });
+        this.setState(state1, () => this.get_user_group(this.state.user.user_group_join_code));
+        console.log(resp.data);
       }
     });
   }
@@ -163,12 +223,17 @@ class Root extends React.Component {
           <Route
             path="/"
             exact={true}
-            render={() => <LoginForm root={this} />}
+            render={() => <LandingPage root={this} />}
           />
           <Route
             path="/register"
             exact={true}
             render={() => <RegisterForm root={this} />}
+          />
+          <Route
+            path="/roommates"
+            exact={true}
+            render={() => <UserGroup root={this} />}
           />
           <Route
             path="/chores"
@@ -183,26 +248,41 @@ class Root extends React.Component {
 
 function Header(props) {
   let { root } = props;
+  let rightHeader = null;
+  if (root.state.session) {
+    rightHeader = (
+      <div className="col-8 row">
+        <div className="col-4">
+          <Link to={"/roommates"}>Roommates</Link>
+        </div>
+        <div className="col-4">
+          <Link to={"/chores"}>House Chores</Link>
+        </div>
+        <div className="col-4">
+          {root.state.user.full_name} | 
+          <a onClick={() => root.logout()}> Logout</a>
+        </div>
+    </div>);
+  } 
   return (
     <div className="row my-2">
       <div className="col-4">
         <h1>ChoreChart</h1>
       </div>
-      <div className="col-4">
-        <Link to={"/chores"}>House Chores</Link>
-      </div>
+      {rightHeader}
     </div>
   );
 }
 
+function LandingPage(props) {
+  let { root } = props;
+  let content = root.state.session ? <HomePage root = {root} /> : <LoginForm root = {root} />;
+  return <div className="container">{content}</div>;
+}
+
 function LoginForm(props) {
   let { root } = props;
-  let loginView;
-  if (root.state.session) {
-    loginView = <p>{"Welcome back, " + root.state.session.user_id}</p>;
-  } else {
-    loginView = (
-      <div className="form-group my-2">
+  return <div className="form-group my-2">
         <h1>Log in</h1>
         <input
           type="email"
@@ -222,10 +302,7 @@ function LoginForm(props) {
         <p>
           <Link to={"/register"}> or Register an Account</Link>
         </p>
-      </div>
-    );
-  }
-  return <div class="container">{loginView}</div>;
+      </div>;
 }
 
 function RegisterForm(props) {
@@ -331,6 +408,41 @@ function RegisterForm(props) {
           Register
         </button>
       </div>
+    </div>
+  );
+}
+
+function HomePage(props) {
+  let { root } = props;
+  return <p>{"Welcome back, " + root.state.user.full_name}</p>;
+}
+
+function User(props) {
+  let { user } = props;
+  return (
+    <div className="row">
+      <div className="col-8">
+        <h3>{user.full_name}</h3>
+      </div>
+      <div className="col-4">
+        {user.score} points
+      </div>
+    </div>
+  );
+}
+
+function UserGroup(props) {
+  let { root } = props;
+  console.log(root.state.user_group);
+  let users = _.map(root.state.user_group.users, u => 
+    <div className="row">
+      <User key={u.id} user={u} />
+    </div>
+  );
+  return (
+    <div>
+      <h2>{root.state.user_group.name}</h2>
+      {users}
     </div>
   );
 }
