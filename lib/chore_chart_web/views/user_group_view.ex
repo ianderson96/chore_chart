@@ -12,6 +12,7 @@ defmodule ChoreChartWeb.UserGroupView do
 
   def render("user_group.json", %{user_group: user_group}) do
     %{name: user_group.name,
-      join_code: user_group.join_code}
+      join_code: user_group.join_code,
+      users: user_group.users}
   end
 end

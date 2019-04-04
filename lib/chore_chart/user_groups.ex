@@ -37,6 +37,12 @@ defmodule ChoreChart.UserGroups do
   """
   def get_user_group!(id), do: Repo.get!(UserGroup, id)
 
+  def get_user_group(id) do
+    Repo.one from ug in UserGroup,
+      where: ug.join_code == ^id,
+      preload: [:users]
+  end
+
   @doc """
   Creates a user_group.
 

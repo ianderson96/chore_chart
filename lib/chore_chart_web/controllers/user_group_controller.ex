@@ -21,7 +21,7 @@ defmodule ChoreChartWeb.UserGroupController do
   end
 
   def show(conn, %{"id" => id}) do
-    user_group = UserGroups.get_user_group!(id)
+    user_group = UserGroups.get_user_group(id)
     render(conn, "show.json", user_group: user_group)
   end
 
