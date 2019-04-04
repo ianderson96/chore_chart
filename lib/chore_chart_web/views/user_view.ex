@@ -15,6 +15,7 @@ defmodule ChoreChartWeb.UserView do
       email: user.email,
       password_hash: user.password_hash,
       full_name: user.full_name,
-      score: user.score}
+      score: user.score,
+      user_group_join_code: user.user_group_join_code}
   end
 end

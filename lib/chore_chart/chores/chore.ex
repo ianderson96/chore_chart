@@ -10,7 +10,7 @@ defmodule ChoreChart.Chores.Chore do
     field(:assign_interval, :integer)
     field(:complete_interval, :integer)
     belongs_to(:user, ChoreChart.Users.User)
-    belongs_to(:user_group, ChoreChart.UserGroups.UserGroup)
+    belongs_to :user_group, ChoreChart.UserGroups.UserGroup, references: :join_code, type: :string, foreign_key: :user_group_join_code
 
     timestamps()
   end
@@ -26,7 +26,7 @@ defmodule ChoreChart.Chores.Chore do
       :assign_interval,
       :complete_interval,
       :user_id,
-      :user_group_id
+      :user_group_join_code
     ])
     |> validate_required([
       :name,
@@ -34,7 +34,7 @@ defmodule ChoreChart.Chores.Chore do
       :completed,
       :assign_interval,
       :complete_interval,
-      :user_group_id
+      :user_group_join_code
     ])
   end
 end
