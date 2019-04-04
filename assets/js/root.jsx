@@ -441,9 +441,11 @@ function UserGroup(props) {
     </div>
   );
   return (
-    <div className="container">
+    <div>
       <h2>{root.state.user_group.name}</h2>
-      {users}
+      <div className="container">
+        {users}
+      </div>
     </div>
   );
 }

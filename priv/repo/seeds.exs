@@ -22,7 +22,7 @@ Repo.insert!(%User{
   email: "ian@pontiac.fun",
   full_name: "Ian Anderson",
   password_hash: pwhash,
-  user_group_id: 1,
+  user_group_join_codeL "test",
   score: 0
 })
 
@@ -30,7 +30,7 @@ Repo.insert!(%User{
   email: "dave@pontiac.fun",
   full_name: "Dave Earley",
   password_hash: pwhash,
-  user_group_id: 1,
+  user_group_join_code: "test",
   score: 0
 })
 
