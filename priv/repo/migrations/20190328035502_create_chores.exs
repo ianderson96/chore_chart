@@ -10,7 +10,7 @@ defmodule ChoreChart.Repo.Migrations.CreateChores do
       add(:assign_interval, :integer, null: false)
       add(:complete_interval, :integer, null: false)
       add(:user_id, references(:users, on_delete: :nothing))
-      add(:user_group_id, references(:user_groups, on_delete: :delete_all))
+      add :user_group_join_code, references(:user_groups, on_delete: :nothing, column: :join_code, type: :string)
 
       timestamps()
     end

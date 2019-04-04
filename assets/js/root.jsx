@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import _ from "lodash";
 import $ from "jquery";
 import { Link, BrowserRouter as Router, Route } from "react-router-dom";
+import shortid from "shortid";
 
 export default function root_init(node) {
   let chores = window.chores;
@@ -25,7 +26,19 @@ class Root extends React.Component {
         join_code: "",
         group_name: ""
       },
-      session: null
+      user: {
+        email: "",
+        full_name: "",
+        password_hash: "",
+        score: 0,
+        user_group_join_code: ""
+      },
+      user_group: {
+        join_code: "",
+        group_name: ""
+      },
+      session: null,
+      users: this.fetch_users()
     };
   }
 
@@ -36,25 +49,72 @@ class Root extends React.Component {
     this.setState(state1);
   }
 
-  registerAndHandleGroup() {
-    // if (this.state.group_action == "create") {
-    // }
+  register() {
+    if (this.state.register_form.group_action === "join") {
+      this.join_user_group();
+    } else {
+      this.create_user_group();
+    }
   }
 
-  register() {
+  create_user_group() {
+    let user_group = { 
+      join_code: shortid.generate(),
+      name: this.state.register_form.group_name
+    };
+    $.ajax("/api/v1/usergroups", {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({ user_group: user_group}),
+      success: resp => {
+        console.log(resp.data);
+        let state1 = _.assign({}, this.state, {
+          user_group: resp.data
+        });
+        this.setState(state1, () => this.register_user());
+      }
+    });
+  }
+
+  join_user_group() {
+    $.ajax("/api/v1/usergroups/" + this.state.register_form.join_code, {
+      method: "get",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: "",
+      success: resp => {
+        console.log(resp.data);
+        let state1 = _.assign({}, this.state, {
+          user_group: resp.data
+        });
+        this.setState(state1, () => this.register_user());
+      }
+    })
+  }
+
+  register_user() {
+    let user = {
+      email: this.state.register_form.email,
+      full_name: this.state.register_form.full_name,
+      password_hash: this.state.register_form.password_hash,
+      score: 0,
+      user_group_join_code: this.state.user_group.join_code
+    }
     $.ajax("/api/v1/users", {
       method: "post",
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
-      data: JSON.stringify({ user: this.state.register_form }),
+      data: JSON.stringify({ user: user }),
       success: resp => {
+        console.log(resp.data);
         let state1 = _.assign({}, this.state, {
+          user: resp.data,
           session: { user_id: resp.data.id }
         });
         this.setState(state1);
-        console.log("set state");
         this.fetch_users();
-        console.log("fetch users");
+        console.log(this.state);
       }
     });
   }
@@ -68,6 +128,7 @@ class Root extends React.Component {
       success: resp => {
         let state1 = _.assign({}, this.state, { users: resp.data });
         this.setState(state1);
+        console.log(resp.data);
       }
     });
   }
@@ -167,6 +228,7 @@ function RegisterForm(props) {
                 <input
                   className="form-check-input"
                   type="radio"
+                  defaultChecked
                   name="group-radio"
                   id="joinExistingGroup"
                   value="join"
@@ -174,7 +236,7 @@ function RegisterForm(props) {
                     root.update_register_form({ group_action: ev.target.value })
                   }
                 />
-                <label className="form-check-label" for="joinExistingGroup">
+                <label className="form-check-label" htmlFor="joinExistingGroup">
                   Join an Existing Group
                 </label>
               </div>
@@ -189,7 +251,7 @@ function RegisterForm(props) {
                     root.update_register_form({ group_action: ev.target.value })
                   }
                 />
-                <label class="form-check-label" for="createNewGroup">
+                <label className="form-check-label" htmlFor="createNewGroup">
                   Create a New Group
                 </label>
               </div>

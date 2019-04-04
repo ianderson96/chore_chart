@@ -2,8 +2,9 @@ defmodule ChoreChart.UserGroups.UserGroup do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:join_code, :string, []}
+  @derive {Phoenix.Param, key: :join_code}
   schema "user_groups" do
-    field(:join_code, :string)
     field(:name, :string)
     has_many(:users, ChoreChart.Users.User)
     has_many(:chores, ChoreChart.Chores.Chore)
