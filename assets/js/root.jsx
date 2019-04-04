@@ -47,7 +47,7 @@ class Root extends React.Component {
   }
 
   update_register_form(data) {
-    console.log(data);
+    // console.log(data);
     let form1 = _.assign({}, this.state.register_form, data);
     let state1 = _.assign({}, this.state, { register_form: form1 });
     this.setState(state1);
@@ -72,7 +72,7 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify({ user_group: user_group}),
       success: resp => {
-        console.log(resp.data);
+        // console.log(resp.data);
         let state1 = _.assign({}, this.state, {
           user_group: resp.data
         });
@@ -88,24 +88,11 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: "",
       success: resp => {
-        console.log(resp.data);
+        // console.log(resp.data);
         let state1 = _.assign({}, this.state, {
           user_group: resp.data
         });
         this.setState(state1, () => this.register_user());
-      }
-    })
-  }
-
-  get_user_group(join_code) {
-    $.ajax("/api/v1/usergroups/" + join_code, {
-      method: "get",
-      dataType: "json",
-      contentType: "application/json; charset=UTF-8",
-      data: "",
-      success: resp => {
-        console.log(resp.data);
-        return resp.data
       }
     })
   }
@@ -124,14 +111,14 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify({ user: user }),
       success: resp => {
-        console.log(resp.data);
+        // console.log(resp.data);
         let state1 = _.assign({}, this.state, {
           user: resp.data,
           session: { user_id: resp.data.id }
         });
         this.setState(state1);
         this.fetch_users();
-        console.log(this.state);
+        // console.log(this.state);
       }
     });
   }
@@ -145,7 +132,7 @@ class Root extends React.Component {
       success: resp => {
         let state1 = _.assign({}, this.state, { users: resp.data });
         this.setState(state1);
-        console.log(resp.data);
+        // console.log(resp.data);
       }
     });
   }
@@ -163,7 +150,7 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify(this.state.login_form),
       success: resp => {
-        console.log(resp.data);
+        // console.log(resp.data);
         let state1 = _.assign({}, this.state, { session: resp.data });
         this.setState(state1, () => this.fetch_current_user());
       }
@@ -209,10 +196,22 @@ class Root extends React.Component {
       data: "",
       success: resp => {
         let state1 = _.assign({}, this.state, { user: resp.data });
-        this.setState(state1, () => this.get_user_group(this.state.user.user_group_join_code));
-        console.log(resp.data);
+        this.setState(state1, () => this.fetch_current_user_group());
       }
     });
+  }
+
+  fetch_current_user_group() {
+    $.ajax("/api/v1/usergroups/" + this.state.user.user_group_join_code, {
+      method: "get",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: "",
+      success: resp => {
+        let state1 = _.assign({}, this.state, { user_group: resp.data });
+        this.setState(state1);
+      }
+    })
   }
 
   render() {
@@ -267,7 +266,9 @@ function Header(props) {
   return (
     <div className="row my-2">
       <div className="col-4">
-        <h1>ChoreChart</h1>
+        <h1>
+          <Link to={"/"}>ChoreChart</Link>
+        </h1>
       </div>
       {rightHeader}
     </div>
@@ -433,14 +434,14 @@ function User(props) {
 
 function UserGroup(props) {
   let { root } = props;
-  console.log(root.state.user_group);
+  console.log(root.state);
   let users = _.map(root.state.user_group.users, u => 
     <div className="row">
       <User key={u.id} user={u} />
     </div>
   );
   return (
-    <div>
+    <div className="container">
       <h2>{root.state.user_group.name}</h2>
       {users}
     </div>
@@ -468,7 +469,7 @@ function Chore(props) {
 
 function ChoreList(props) {
   let { root } = props;
-  console.log(root.state.chores);
+  // console.log(root.state.chores);
   let chores = _.map(root.state.chores, c => <Chore key={c.id} chore={c} />);
   return (
     <div className="container">
