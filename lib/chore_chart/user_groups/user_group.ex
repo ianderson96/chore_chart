@@ -17,5 +17,6 @@ defmodule ChoreChart.UserGroups.UserGroup do
     user_group
     |> cast(attrs, [:name, :join_code])
     |> validate_required([:name, :join_code])
+    |> foreign_key_constraint(:join_code)
   end
 end

@@ -19,6 +19,7 @@ defmodule ChoreChartWeb.Router do
     resources("/users", UserController, except: [:new, :edit])
     resources("/chores", ChoreController, except: [:new, :edit])
     resources("/usergroups", UserGroupController, except: [:new, :edit])
+    post("/auth", AuthController, :authenticate)
   end
 
   scope "/", ChoreChartWeb do

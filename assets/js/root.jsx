@@ -26,6 +26,10 @@ class Root extends React.Component {
         join_code: "",
         group_name: ""
       },
+      login_form: {
+        email: "",
+        password_hash: ""
+      },
       user: {
         email: "",
         full_name: "",
@@ -37,8 +41,7 @@ class Root extends React.Component {
         join_code: "",
         group_name: ""
       },
-      session: null,
-      users: this.fetch_users()
+      session: null
     };
   }
 
@@ -133,6 +136,25 @@ class Root extends React.Component {
     });
   }
 
+  update_login_form(data) {
+    let form1 = _.assign({}, this.state.login_form, data);
+    let state1 = _.assign({}, this.state, { login_form: form1 });
+    this.setState(state1);
+  }
+
+  login() {
+    $.ajax("/api/v1/auth", {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify(this.state.login_form),
+      success: resp => {
+        let state1 = _.assign({}, this.state, { session: resp.data });
+        this.setState(state1);
+      }
+    });
+  }
+
   render() {
     return (
       <Router>
@@ -141,7 +163,17 @@ class Root extends React.Component {
           <Route
             path="/"
             exact={true}
+            render={() => <LoginForm root={this} />}
+          />
+          <Route
+            path="/register"
+            exact={true}
             render={() => <RegisterForm root={this} />}
+          />
+          <Route
+            path="/chores"
+            exact={true}
+            render={() => <ChoreList root={this} />}
           />
         </div>
       </Router>
@@ -153,11 +185,47 @@ function Header(props) {
   let { root } = props;
   return (
     <div className="row my-2">
-      <div className="col-2">
+      <div className="col-4">
         <h1>ChoreChart</h1>
+      </div>
+      <div className="col-4">
+        <Link to={"/chores"}>House Chores</Link>
       </div>
     </div>
   );
+}
+
+function LoginForm(props) {
+  let { root } = props;
+  let loginView;
+  if (root.state.session) {
+    loginView = <p>{"Welcome back, " + root.state.session.user_id}</p>;
+  } else {
+    loginView = (
+      <div className="form-group my-2">
+        <h1>Log in</h1>
+        <input
+          type="email"
+          placeholder="email"
+          onChange={ev => root.update_login_form({ email: ev.target.value })}
+          className="form-control"
+        />
+        <input
+          type="password"
+          placeholder="password"
+          onChange={ev => root.update_login_form({ password: ev.target.value })}
+          className="form-control"
+        />
+        <button onClick={() => root.login()} className="btn btn-primary">
+          Login
+        </button>
+        <p>
+          <Link to={"/register"}> or Register an Account</Link>
+        </p>
+      </div>
+    );
+  }
+  return <div class="container">{loginView}</div>;
 }
 
 function RegisterForm(props) {
@@ -263,6 +331,36 @@ function RegisterForm(props) {
           Register
         </button>
       </div>
+    </div>
+  );
+}
+
+function Chore(props) {
+  let { chore } = props;
+  return (
+    <div className="card col-10">
+      <div className="card-body">
+        <h2 className="card-title">{chore.name}</h2>
+        <p className="card-text">
+          {chore.desc} <br />
+          {chore.value} points
+          <br />
+          Re-assigned every {chore.assign_interval} days
+          <br />
+          Completed every {chore.complete_interval} days
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ChoreList(props) {
+  let { root } = props;
+  console.log(root.state.chores);
+  let chores = _.map(root.state.chores, c => <Chore key={c.id} chore={c} />);
+  return (
+    <div className="container">
+      <div className="row">{chores}</div>
     </div>
   );
 }
