@@ -73,3 +73,14 @@ config :chore_chart, ChoreChart.Repo,
   database: "chore_chart_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :logger, level: :debug
+
+config :chore_chart, ChoreChart.Scheduler,
+  jobs: [
+    phoenix_job: [
+    schedule: "* * * * *", 
+    task: {ChoreChart.Chores, :assign_chores, []},
+    ]
+  ]
+  
