@@ -22,7 +22,7 @@ Repo.insert!(%User{
   email: "ian@pontiac.fun",
   full_name: "Ian Anderson",
   password_hash: pwhash,
-  user_group_join_codeL "test",
+  user_group_join_code: "test",
   score: 0
 })
 
@@ -39,6 +39,9 @@ Repo.insert!(%Chore{
   desc: "Scrub shower, toilet, and sink. Mop floor and tidy counter.",
   completed: false,
   value: 5,
-  assign_interval: 7,
-  complete_interval: 7
+  assign_interval: 3,
+  complete_interval: 3,
+  days_passed_for_assign: 0,
+  days_passed_for_complete: 0,
+  user_group_join_code: "test"
 })

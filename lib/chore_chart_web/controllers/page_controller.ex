@@ -13,6 +13,8 @@ defmodule ChoreChartWeb.PageController do
           :value,
           :assign_interval,
           :complete_interval,
+          :days_passed_for_complete,
+          :days_passed_for_assign,
           :user_id,
           :user_group_id
         ])

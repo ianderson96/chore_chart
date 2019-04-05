@@ -1,4 +1,5 @@
 defmodule ChoreChart do
+
   @moduledoc """
   ChoreChart keeps the contexts that define your domain
   and business logic.
