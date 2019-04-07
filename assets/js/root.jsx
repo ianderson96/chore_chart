@@ -335,12 +335,12 @@ function Header(props) {
   let rightHeader = null;
   if (root.state.session) {
     rightHeader = (
-      <div className="col-8 row">
+      <div className="col-8 mt-2 row">
         <div className="col-4">
-          <Link to={"/roommates"}>Roommates</Link>
+          <Link to={"/roommates"}><span className="navHeader">Roommates</span></Link>
         </div>
         <div className="col-4">
-          <Link to={"/chores"}>House Chores</Link>
+          <Link to={"/chores"}><span className="navHeader">House Chores</span></Link>
         </div>
         <div className="col-4">
           {root.state.user.full_name} | 
@@ -352,7 +352,7 @@ function Header(props) {
     <div className="row my-2">
       <div className="col-4">
         <h1>
-          <Link to={"/"}>ChoreChart</Link>
+          <Link to={"/"}><img className="logo-image" src="https://i.imgur.com/YHCsjkU.png" /></Link>
         </h1>
       </div>
       {rightHeader}
@@ -511,17 +511,8 @@ function HomePage(props) {
   let { root } = props;
   return (
     <div className="container">
-      <p>{"Welcome back, " + root.state.user.full_name}</p>
-      <div className="row">
-        <div className="row-8">
-          <h3>My chores</h3>
+          <span className="cc-title mb-3"><strong>My chores</strong></span>
           <ChoreList root={root} chores={root.get_user_chores(root.state.user.id)}/>
-        </div>
-        <div className="row-4">
-          <h3>Activity Feed</h3>
-          <h3>Leaderboard</h3>
-        </div>
-      </div>
     </div>
   );
 }
@@ -529,14 +520,13 @@ function HomePage(props) {
 function User(props) {
   let root = props.root;
   let user = props.user;
-  console.log(user);
-  // console.log(props);
   return (
-    <div className="row">
-      <div className="col-8">
-        <h3>{user.full_name}</h3>
+    <div className="row my-3">
+      <div className="col-12">
+        <p className="roommate-name my-1"><strong>{user.full_name}</strong></p>
+        <hr className="mt-0"/>
       </div>
-      <div className="col-4">
+      <div className="col-12">
         <ChoreList root={root} chores={root.get_user_chores(user.id)}/>
       </div>
     </div>
@@ -545,15 +535,13 @@ function User(props) {
 
 function UserGroup(props) {
   let { root } = props;
-  console.log(root.state);
   let users = _.map(root.state.user_group.users, u => 
-    <div className="row">
       <User root={root} key={u.id} user={u} />
-    </div>
   );
   return (
     <div>
-      <h2>{root.state.user_group.name}</h2>
+      <span className="cc-title my-3"><strong>{root.state.user_group.name}</strong></span>
+      <span className="join-code mx-3 my-3 px-2 py-2">Join code: {root.state.user_group.join_code}</span>
       <div className="container">
         {users}
       </div>
@@ -565,29 +553,34 @@ function Chore(props) {
   let { root } = props;
   let chore = props.chore;
   let actionGroup;
+  let badge;
   if (chore.user_id === root.state.user.id) {
     if (chore.completed) {
       actionGroup = 
         <span>
-          <button className="btn btn-secondary disabled">Completed!</button>
-        </span>
+        </span>;
+      badge = <span className="tag badge badge-success py-2 px-2 mx-3">COMPLETED</span>
     } else {
       actionGroup = 
         <span>
-          <button className="btn btn-secondary" onClick={() => root.complete_chore(chore)}>Mark as completed</button>
-        </span>
+          <button className="btn btn-primary" onClick={() => root.complete_chore(chore)}>Mark as completed</button>
+        </span>;
+      badge = 
+        <span>
+        </span>;
     }
   } else {
     actionGroup = 
       <span>
-        <button className="btn btn-secondary" onClick={() => root.send_reminder(chore)}>Send Reminder</button>
-        <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Edit</button></Link>
+        <button className="btn btn-warning" onClick={() => root.send_reminder(chore)}>Send Reminder</button>
+        <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-light">Edit</button></Link>
       </span>
   }
   return (
-    <div className="card col-10">
+    <div className="row">
+    <div className="card mb-3">
+    <h4 className="card-header"><strong>{chore.name}</strong> {badge}</h4>
       <div className="card-body">
-        <h2 className="card-title">{chore.name}</h2>
         <p className="card-text">
           {chore.desc} <br />
           Re-assigned every {chore.assign_interval} days
@@ -595,7 +588,8 @@ function Chore(props) {
           Completed every {chore.complete_interval} days<br/>
         </p>
         {actionGroup}
-        </div>
+      </div>
+    </div>
     </div>
   );
 }
@@ -603,10 +597,16 @@ function Chore(props) {
 function ChoreList(props) {
   let root = props.root;
   let houseChores = props.chores;
-  let chores = _.map(houseChores, c => <Chore key={c.id} chore={c} root={root} />);
+  let chores;
+  if (houseChores.length == 0) {
+    chores = <p className="placeholder">No chores yet!</p>;
+  }
+  else {
+    chores = _.map(houseChores, c => <Chore key={c.id} chore={c} root={root} />);
+  }
   return (
     <div className="container">
-      <div className="row">{chores}</div>
+      {chores}
     </div>
   );
 }
@@ -624,7 +624,7 @@ function ChorePage(props) {
   }
   return (
     <div className="container">
-      <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Add Chore</button></Link>
+      <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-primary mb-3">Add Chore</button></Link>
       <ChoreList root={root} chores={root.state.user_group.chores} />
     </div>
   );
@@ -636,10 +636,10 @@ function ChoreForm(props) {
   let choreTitle, choreButton;
   if (chore.id) {
     choreTitle = "Edit Chore";
-    choreButton = <Link to={"/chores"}><button onClick={() => root.update_chore()} className="btn btn-secondary">Save</button></Link>
+    choreButton = <Link to={"/chores"}><button onClick={() => root.update_chore()} className="btn btn-primary">Save</button></Link>
   } else {
     choreTitle = "New Chore";
-    choreButton = <Link to={"/chores"}><button onClick={() => root.create_chore()} className="btn btn-secondary">Save</button></Link>
+    choreButton = <Link to={"/chores"}><button onClick={() => root.create_chore()} className="btn btn-primary">Save</button></Link>
   }
   return (
     <div className="container">
