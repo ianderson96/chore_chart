@@ -52,6 +52,8 @@ class Root extends React.Component {
         value: 1,
         assign_interval: 7,
         complete_interval: 7,
+        days_passed_for_assign: 0,
+        days_passed_for_complete: 0,
         user: null
       }
     };
@@ -244,6 +246,7 @@ class Root extends React.Component {
 
   create_chore() {
     let chore = this.state.chore_form;
+    chore.user_group_join_code = this.state.user_group.join_code;
     $.ajax("/api/v1/chores", {
       method: "post",
       dataType: "json",
