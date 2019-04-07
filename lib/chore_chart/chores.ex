@@ -136,7 +136,6 @@ defmodule ChoreChart.Chores do
     end
 
     if chore.assign_interval - 1 == chore.days_passed_for_assign do
-      newChore = Map.merge(chore, %{days_passed_for_assign: 0, days_passed_for_complete: 0, user_id: id})
       update_chore(chore, %{days_passed_for_complete: 0});
       update_chore(chore, %{days_passed_for_assign: 0});
       update_chore(chore, %{user_id: id});
@@ -147,7 +146,6 @@ defmodule ChoreChart.Chores do
 
   # Assigns all Chores to users, using their assign_intervals
   def assign_chores do
-    IO.inspect(label: "IT RAN")
     Repo.all(Chore)
     |> Enum.map(fn c -> process_chore(c) end)
   end

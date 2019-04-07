@@ -19,6 +19,7 @@ class Root extends React.Component {
       users: props.users,
       register_form: {
         email: "",
+        phone_number: "",
         full_name: "",
         password_hash: "",
         score: 0,
@@ -110,10 +111,11 @@ class Root extends React.Component {
   register_user() {
     let user = {
       email: this.state.register_form.email,
+      phone_number: this.state.register_form.phone_number,
       full_name: this.state.register_form.full_name,
       password_hash: this.state.register_form.password_hash,
       score: 0,
-      user_group_join_code: this.state.user_group.join_code
+      user_group_join_code: this.state.user_group.join_code,
     }
     $.ajax("/api/v1/users", {
       method: "post",
@@ -424,6 +426,15 @@ function RegisterForm(props) {
             />
           </div>
           <div className="form-group">
+          <input className= "form-control" type="tel" id="phone" name="phone" placeholder="1234567890"
+          onChange={ev =>
+            root.update_register_form({ phone_number: "+1" + ev.target.value })
+          }
+          pattern="[0-9]{10}"
+          required></input>
+          <p>Format: ##########</p>
+          </div>
+          <div className="form-group">
             <input
               type="text"
               placeholder="full name"
@@ -480,9 +491,9 @@ function RegisterForm(props) {
           </fieldset>
           <div className="form-group">{groupInput}</div>
         </form>
-        <button onClick={() => root.register()} className="btn btn-secondary">
+        <Link to={"/"}><button onClick={() => root.register()} className="btn btn-secondary">
           Register
-        </button>
+        </button></Link>
       </div>
     </div>
   );
