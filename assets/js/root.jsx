@@ -209,6 +209,19 @@ class Root extends React.Component {
     });
   }
 
+  // fetch_user_name() {
+  //   $.ajax("/api/v1/users/" + this.state.session.user_id, {
+  //     method: "get",
+  //     dataType: "json",
+  //     contentType: "application/json; charset=UTF-8",
+  //     data: "",
+  //     success: resp => {
+  //       let state1 = _.assign({}, this.state, { user: resp.data });
+  //       this.setState(state1, () => this.fetch_current_user_group());
+  //     }
+  //   });
+  // }
+
   fetch_current_user_group() {
     $.ajax("/api/v1/usergroups/" + this.state.user.user_group_join_code, {
       method: "get",
@@ -511,7 +524,8 @@ function Chore(props) {
           <br />
           Re-assigned every {chore.assign_interval} days
           <br />
-          Completed every {chore.complete_interval} days
+          Completed every {chore.complete_interval} days<br/>
+          Currently assigned to: {chore.user_id}
         </p>
        <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Edit</button></Link>
       </div>

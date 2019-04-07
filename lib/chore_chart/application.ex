@@ -6,14 +6,16 @@ defmodule ChoreChart.Application do
   use Application
 
   def start(_type, _args) do
+    import Supervisor.Spec
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-      ChoreChart.Repo,
+      supervisor(ChoreChart.Repo, []),
       # Start the endpoint when the application starts
-      ChoreChartWeb.Endpoint
+      supervisor(ChoreChartWeb.Endpoint, []),
       # Starts a worker by calling: ChoreChart.Worker.start_link(arg)
       # {ChoreChart.Worker, arg},
+      worker(ChoreChart.Scheduler, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

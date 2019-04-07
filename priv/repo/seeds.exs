@@ -42,7 +42,9 @@ Repo.insert!(%Chore{
   desc: "Scrub shower, toilet, and sink. Mop floor and tidy counter.",
   completed: false,
   value: 5,
-  assign_interval: 7,
-  complete_interval: 7,
+  assign_interval: 3,
+  complete_interval: 3,
+  days_passed_for_assign: 0,
+  days_passed_for_complete: 0,
   user_group_join_code: "test"
 })

@@ -7,6 +7,9 @@ defmodule ChoreChart.Chores do
   alias ChoreChart.Repo
 
   alias ChoreChart.Chores.Chore
+  alias ChoreChart.UserGroups
+
+  alias ChoreChartWeb.ChoreController
 
   @doc """
   Returns the list of chores.
@@ -106,5 +109,37 @@ defmodule ChoreChart.Chores do
   """
   def change_chore(%Chore{} = chore) do
     Chore.changeset(chore, %{})
+  end
+
+  # Processes a chore to automatically assign the chore and reset its completion status.
+  # This function should be run once each day on each chore in order to keep the chores 
+  # assigning as they should be.
+  def process_chore(%Chore{} = chore) do
+    id = UserGroups.get_random_user(chore.user_group_join_code).id
+    if chore.user_id == nil do
+      update_chore(chore, %{user_id: id});
+    end
+    if chore.complete_interval - 1 == chore.days_passed_for_complete do
+      update_chore(chore, %{days_passed_for_complete: 0});
+      update_chore(chore, %{completed: false});
+    else
+      update_chore(chore, %{days_passed_for_complete: chore.days_passed_for_complete + 1});
+    end
+
+    if chore.assign_interval - 1 == chore.days_passed_for_assign do
+      newChore = Map.merge(chore, %{days_passed_for_assign: 0, days_passed_for_complete: 0, user_id: id})
+      update_chore(chore, %{days_passed_for_complete: 0});
+      update_chore(chore, %{days_passed_for_assign: 0});
+      update_chore(chore, %{user_id: id});
+    else
+      update_chore(chore, %{days_passed_for_assign: chore.days_passed_for_assign + 1});
+    end
+  end
+
+  # Assigns all Chores to users, using their assign_intervals
+  def assign_chores do
+    IO.inspect(label: "IT RAN")
+    Repo.all(Chore)
+    |> Enum.map(fn c -> process_chore(c) end)
   end
 end
