@@ -2,7 +2,7 @@ defmodule ChoreChart.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:email, :full_name, :score]}
+  @derive {Jason.Encoder, only: [:id, :email, :full_name, :score]}
   schema "users" do
     field :email, :string
     field :phone_number, :string

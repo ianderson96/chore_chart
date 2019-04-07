@@ -79,7 +79,7 @@ config :logger, level: :debug
 config :chore_chart, ChoreChart.Scheduler,
   jobs: [
     phoenix_job: [
-    schedule: "* * * * *", 
+    schedule: "0 0 * * *", 
     task: {ChoreChart.Chores, :assign_chores, []},
     ]
   ]

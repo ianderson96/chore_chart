@@ -32,6 +32,7 @@ class Root extends React.Component {
         password_hash: ""
       },
       user: {
+        id: "",
         email: "",
         full_name: "",
         password_hash: "",
@@ -213,18 +214,11 @@ class Root extends React.Component {
     });
   }
 
-  // fetch_user_name() {
-  //   $.ajax("/api/v1/users/" + this.state.session.user_id, {
-  //     method: "get",
-  //     dataType: "json",
-  //     contentType: "application/json; charset=UTF-8",
-  //     data: "",
-  //     success: resp => {
-  //       let state1 = _.assign({}, this.state, { user: resp.data });
-  //       this.setState(state1, () => this.fetch_current_user_group());
-  //     }
-  //   });
-  // }
+  get_user_chores(user_id) {
+    let chores = this.state.user_group.chores;
+    let userChores = _.filter(chores, function(c){ return c.user_id === user_id });
+    return userChores;
+  }
 
   fetch_current_user_group() {
     $.ajax("/api/v1/usergroups/" + this.state.user.user_group_join_code, {
@@ -255,6 +249,20 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify({ chore: chore }),
       success: resp => {
+        console.log(resp.data);
+        this.fetch_current_user_group();
+      }
+    });
+  }
+
+  complete_chore(chore) {
+    chore.completed = true;
+    $.ajax("/api/v1/chores/" + chore.id, {
+      method: "put",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({ id: chore.id, chore: chore }),
+      success: (resp) => {
         console.log(resp.data);
         this.fetch_current_user_group();
       }
@@ -501,18 +509,35 @@ function RegisterForm(props) {
 
 function HomePage(props) {
   let { root } = props;
-  return <p>{"Welcome back, " + root.state.user.full_name}</p>;
+  return (
+    <div className="container">
+      <p>{"Welcome back, " + root.state.user.full_name}</p>
+      <div className="row">
+        <div className="row-8">
+          <h3>My chores</h3>
+          <ChoreList root={root} chores={root.get_user_chores(root.state.user.id)}/>
+        </div>
+        <div className="row-4">
+          <h3>Activity Feed</h3>
+          <h3>Leaderboard</h3>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function User(props) {
-  let { user } = props;
+  let root = props.root;
+  let user = props.user;
+  console.log(user);
+  // console.log(props);
   return (
     <div className="row">
       <div className="col-8">
         <h3>{user.full_name}</h3>
       </div>
       <div className="col-4">
-        {user.score} points
+        <ChoreList root={root} chores={root.get_user_chores(user.id)}/>
       </div>
     </div>
   );
@@ -523,7 +548,7 @@ function UserGroup(props) {
   console.log(root.state);
   let users = _.map(root.state.user_group.users, u => 
     <div className="row">
-      <User key={u.id} user={u} />
+      <User root={root} key={u.id} user={u} />
     </div>
   );
   return (
@@ -539,28 +564,44 @@ function UserGroup(props) {
 function Chore(props) {
   let { root } = props;
   let chore = props.chore;
+  let actionGroup;
+  if (chore.user_id === root.state.user.id) {
+    if (chore.completed) {
+      actionGroup = 
+        <span>
+          <button className="btn btn-secondary disabled">Completed!</button>
+        </span>
+    } else {
+      actionGroup = 
+        <span>
+          <button className="btn btn-secondary" onClick={() => root.complete_chore(chore)}>Mark as completed</button>
+        </span>
+    }
+  } else {
+    actionGroup = 
+      <span>
+        <button className="btn btn-secondary" onClick={() => root.send_reminder(chore)}>Send Reminder</button>
+        <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Edit</button></Link>
+      </span>
+  }
   return (
     <div className="card col-10">
       <div className="card-body">
         <h2 className="card-title">{chore.name}</h2>
         <p className="card-text">
           {chore.desc} <br />
-          {chore.value} points
-          <br />
           Re-assigned every {chore.assign_interval} days
           <br />
           Completed every {chore.complete_interval} days<br/>
-          Currently assigned to: {chore.user_id}
         </p>
-        <button className="btn btn-secondary" onClick={() => root.send_reminder(chore)}>Send Reminder</button>
-       <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Edit</button></Link>
-      </div>
+        {actionGroup}
+        </div>
     </div>
   );
 }
 
 function ChoreList(props) {
-  let { root } = props;
+  let root = props.root;
   let houseChores = props.chores;
   let chores = _.map(houseChores, c => <Chore key={c.id} chore={c} root={root} />);
   return (
