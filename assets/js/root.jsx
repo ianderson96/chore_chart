@@ -40,14 +40,24 @@ class Root extends React.Component {
       user_group: {
         join_code: "",
         group_name: "",
-        users: []
+        users: [],
+        chores: []
       },
-      session: null
+      session: null,
+      chore_form: {
+        completed: false,
+        desc: "",
+        name: "",
+        id: "",
+        value: 1,
+        assign_interval: 7,
+        complete_interval: 7,
+        user: null
+      }
     };
   }
 
   update_register_form(data) {
-    // console.log(data);
     let form1 = _.assign({}, this.state.register_form, data);
     let state1 = _.assign({}, this.state, { register_form: form1 });
     this.setState(state1);
@@ -72,7 +82,6 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify({ user_group: user_group}),
       success: resp => {
-        // console.log(resp.data);
         let state1 = _.assign({}, this.state, {
           user_group: resp.data
         });
@@ -88,7 +97,6 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: "",
       success: resp => {
-        // console.log(resp.data);
         let state1 = _.assign({}, this.state, {
           user_group: resp.data
         });
@@ -111,14 +119,12 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify({ user: user }),
       success: resp => {
-        // console.log(resp.data);
         let state1 = _.assign({}, this.state, {
           user: resp.data,
           session: { user_id: resp.data.id }
         });
         this.setState(state1);
         this.fetch_users();
-        // console.log(this.state);
       }
     });
   }
@@ -132,7 +138,6 @@ class Root extends React.Component {
       success: resp => {
         let state1 = _.assign({}, this.state, { users: resp.data });
         this.setState(state1);
-        // console.log(resp.data);
       }
     });
   }
@@ -150,7 +155,6 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify(this.state.login_form),
       success: resp => {
-        // console.log(resp.data);
         let state1 = _.assign({}, this.state, { session: resp.data });
         this.setState(state1, () => this.fetch_current_user());
       }
@@ -182,9 +186,13 @@ class Root extends React.Component {
       user_group: {
         join_code: "",
         group_name: "",
-        users: []
+        users: [],
+        chores: []
       },
-      session: null
+      session: null,
+      chore_form: {
+
+      }
     })
   }
 
@@ -221,10 +229,45 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: "",
       success: resp => {
+        console.log(resp.data);
         let state1 = _.assign({}, this.state, { user_group: resp.data });
         this.setState(state1);
       }
     })
+  }
+
+  update_chore_form(data) {
+    let form1 = _.assign({}, this.state.chore_form, data);
+    let state1 = _.assign({}, this.state, { chore_form: form1 });
+    this.setState(state1);
+  }
+
+  create_chore() {
+    let chore = this.state.chore_form;
+    $.ajax("/api/v1/chores", {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({ chore: chore }),
+      success: resp => {
+        console.log(resp.data);
+        this.fetch_current_user_group();
+      }
+    });
+  }
+
+  update_chore() {
+    let chore = this.state.chore_form;
+    $.ajax("/api/v1/chores/" + chore.id, {
+      method: "put",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({ id: chore.id, chore: chore }),
+      success: (resp) => {
+        console.log(resp.data);
+        this.fetch_current_user_group();
+      }
+    });
   }
 
   render() {
@@ -250,7 +293,12 @@ class Root extends React.Component {
           <Route
             path="/chores"
             exact={true}
-            render={() => <ChoreList root={this} />}
+            render={() => <ChorePage root={this} />}
+          />
+          <Route
+            path="/chores/edit/"
+            exact={true}
+            render={() => <ChoreForm root={this}/>} 
           />
         </div>
       </Router>
@@ -272,7 +320,7 @@ function Header(props) {
         </div>
         <div className="col-4">
           {root.state.user.full_name} | 
-          <a onClick={() => root.logout()}> Logout</a>
+          <Link to={"/"} onClick={() => root.logout()}> Logout</Link>
         </div>
     </div>);
   } 
@@ -464,7 +512,8 @@ function UserGroup(props) {
 }
 
 function Chore(props) {
-  let { chore } = props;
+  let { root } = props;
+  let chore = props.chore;
   return (
     <div className="card col-10">
       <div className="card-body">
@@ -478,6 +527,7 @@ function Chore(props) {
           Completed every {chore.complete_interval} days<br/>
           Currently assigned to: {chore.user_id}
         </p>
+       <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Edit</button></Link>
       </div>
     </div>
   );
@@ -485,12 +535,111 @@ function Chore(props) {
 
 function ChoreList(props) {
   let { root } = props;
-  // console.log(root.state.chores);
-  let chores = _.map(root.state.chores, c => <Chore key={c.id} chore={c} />);
-  console.log(chores);
+  let houseChores = props.chores;
+  let chores = _.map(houseChores, c => <Chore key={c.id} chore={c} root={root} />);
   return (
     <div className="container">
       <div className="row">{chores}</div>
     </div>
   );
 }
+
+function ChorePage(props) {
+  let { root } = props;
+  let chore = {
+    completed: false,
+    desc: "",
+    name: "",
+    value: "",
+    assign_interval: "",
+    complete_interval: "",
+    user: null
+  }
+  return (
+    <div className="container">
+      <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Add Chore</button></Link>
+      <ChoreList root={root} chores={root.state.user_group.chores} />
+    </div>
+  );
+}
+
+function ChoreForm(props) {
+  let { root } = props;
+  let chore = root.state.chore_form;
+  let choreTitle, choreButton;
+  if (chore.id) {
+    choreTitle = "Edit Chore";
+    choreButton = <Link to={"/chores"}><button onClick={() => root.update_chore()} className="btn btn-secondary">Save</button></Link>
+  } else {
+    choreTitle = "New Chore";
+    choreButton = <Link to={"/chores"}><button onClick={() => root.create_chore()} className="btn btn-secondary">Save</button></Link>
+  }
+  return (
+    <div className="container">
+      <h1>{choreTitle}</h1>
+      <div className="row">
+        <form className="col-12">
+          <div className="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              placeholder="Ex. Taking out the trash"
+              value={chore.name}
+              onChange={ev =>
+                root.update_chore_form({ name: ev.target.value })
+              }
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              placeholder="Ex. Empty all the trash and bring it to the dumpster outside"
+              value={chore.desc}
+              onChange={ev =>
+                root.update_chore_form({ desc: ev.target.value })
+              }
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+          <label>Points</label>
+            <input
+              type="number"
+              value={chore.value}
+              onChange={ev =>
+                root.update_chore_form({ value: ev.target.value })
+              }
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>Number of days before it's reassigned</label>
+            <input
+              type="number"
+              value={chore.assign_interval}
+              onChange={ev =>
+                root.update_chore_form({ assign_interval: ev.target.value })
+              }
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>Number of days before it needs to be done again</label>
+            <input
+              type="number"
+              value={chore.complete_interval}
+              onChange={ev =>
+                root.update_chore_form({ complete_interval: ev.target.value })
+              }
+              className="form-control"
+            />
+          </div>
+        </form>
+        <Link to={"/chores"}><button className="btn btn-secondary">Cancel</button></Link>
+        {choreButton}
+      </div>
+    </div>
+  );
+}
+

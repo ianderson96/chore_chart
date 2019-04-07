@@ -2,6 +2,7 @@ defmodule ChoreChart.Chores.Chore do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :completed, :desc, :name, :value, :assign_interval, :complete_interval, :user_id]}
   schema "chores" do
     field(:completed, :boolean, default: false)
     field(:desc, :string)

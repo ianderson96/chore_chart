@@ -40,6 +40,12 @@ defmodule ChoreChart.Chores do
   """
   def get_chore!(id), do: Repo.get!(Chore, id)
 
+  def get_chore(id) do
+    Repo.one from c in Chore,
+      where: c.id == ^id,
+      preload: [:user]
+  end
+
   @doc """
   Creates a chore.
 

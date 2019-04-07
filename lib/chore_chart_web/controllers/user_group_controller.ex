@@ -26,7 +26,7 @@ defmodule ChoreChartWeb.UserGroupController do
   end
 
   def update(conn, %{"id" => id, "user_group" => user_group_params}) do
-    user_group = UserGroups.get_user_group!(id)
+    user_group = UserGroups.get_user_group(id)
 
     with {:ok, %UserGroup{} = user_group} <- UserGroups.update_user_group(user_group, user_group_params) do
       render(conn, "show.json", user_group: user_group)
@@ -34,7 +34,7 @@ defmodule ChoreChartWeb.UserGroupController do
   end
 
   def delete(conn, %{"id" => id}) do
-    user_group = UserGroups.get_user_group!(id)
+    user_group = UserGroups.get_user_group(id)
 
     with {:ok, %UserGroup{}} <- UserGroups.delete_user_group(user_group) do
       send_resp(conn, :no_content, "")
