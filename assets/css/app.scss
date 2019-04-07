@@ -1,3 +1,57 @@
 /* This file is for your main application css. */
 
 @import "~bootstrap/scss/bootstrap";
+
+.logo-image {
+    height: 35px;
+}
+
+.card-header {
+    background-color: #7fbfe9 !important;
+    color: white;
+    border:none;
+}
+
+.card {
+    border: none;
+    -webkit-box-shadow: 3px 3px 27px 0px rgba(235,235,235,1);
+    -moz-box-shadow: 3px 3px 27px 0px rgba(235,235,235,1);
+    box-shadow: 3px 3px 27px 0px rgba(235,235,235,1);
+    width: 60%
+}
+
+.roommate-name {
+    font-size: 18px;
+    color:darkslategray;
+}
+
+.placeholder {
+    font-size: 16px;
+    color:lightgray;
+}
+
+hr {
+    border-top: 1px solid lightgray;
+}
+
+.cc-title {
+    font-size: 30px;
+    color: #7fbfe9;
+}
+
+.join-code {
+    font-size: 20px;
+    color: darkslategray;
+    font-style: italic;
+    border: 1px solid lightgray;
+    border-radius:4px;
+}
+
+.navHeader {
+    font-size: 18px;
+}
+
+.tag {
+    font-size:10px;
+    float:right;
+}

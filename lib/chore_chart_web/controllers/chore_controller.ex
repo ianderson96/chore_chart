@@ -3,6 +3,7 @@ defmodule ChoreChartWeb.ChoreController do
 
   alias ChoreChart.Chores
   alias ChoreChart.Chores.Chore
+  alias ChoreChart.UserGroups
 
   action_fallback ChoreChartWeb.FallbackController
 
@@ -12,7 +13,9 @@ defmodule ChoreChartWeb.ChoreController do
   end
 
   def create(conn, %{"chore" => chore_params}) do
-    with {:ok, %Chore{} = chore} <- Chores.create_chore(chore_params) do
+    randomUser = UserGroups.get_random_user(Map.get(chore_params, "user_group_join_code"))
+    newParams = Map.put(chore_params, "user_id", randomUser.id)
+    with {:ok, %Chore{} = chore} <- Chores.create_chore(newParams) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.chore_path(conn, :show, chore))
