@@ -18,7 +18,7 @@ defmodule ChoreChart.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:email, :password_hash, :full_name, :score, :user_group_join_code])
-    |> validate_required([:email, :password_hash, :full_name, :score])
+    |> cast(attrs, [:email, :password_hash, :full_name, :score, :phone_number, :user_group_join_code])
+    |> validate_required([:email, :password_hash, :full_name, :score, :phone_number])
   end
 end
