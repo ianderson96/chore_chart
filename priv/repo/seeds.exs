@@ -21,6 +21,7 @@ Repo.insert!(%UserGroup{name: "Outkast", join_code: "test"})
 Repo.insert!(%User{
   id: 1,
   email: "hey@ya.com",
+  phone_number: "+16038926145",
   full_name: "Andre 3000",
   password_hash: pwhash,
   user_group_join_code: "test",
@@ -30,6 +31,7 @@ Repo.insert!(%User{
 Repo.insert!(%User{
   id: 2,
   email: "ms@jackson.net",
+  phone_number: "+16038926145",
   full_name: "Big Boi",
   password_hash: pwhash,
   user_group_join_code: "test",

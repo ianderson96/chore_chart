@@ -4,6 +4,7 @@ defmodule ChoreChart.Repo.Migrations.CreateUsers do
   def change do
     create table(:users) do
       add :email, :string, null: false
+      add :phone_number, :string, null: false
       add :password_hash, :string, null: false
       add :full_name, :string, null: false
       add :score, :integer, null: false
