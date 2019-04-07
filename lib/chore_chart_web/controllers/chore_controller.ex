@@ -20,6 +20,11 @@ defmodule ChoreChartWeb.ChoreController do
     end
   end
 
+  def remind(conn, %{"id" => id, "name" => name}) do
+    Chores.send_reminder(id, name)
+    send_resp(conn, :no_content, "")
+  end
+
   def show(conn, %{"id" => id}) do
     chore = Chores.get_chore(id)
     render(conn, "show.json", chore: chore)

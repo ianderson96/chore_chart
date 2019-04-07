@@ -46,6 +46,15 @@ defmodule ChoreChart.Chores do
       preload: [:user]
   end
 
+  def send_reminder(id, name) do
+    chore = get_chore(id)
+    number = chore.user.phone_number
+    ourNumber = "+16038368314"
+    body = "Message from ChoreChart: " <> name <> 
+    " would like to remind you to complete the chore: " <> chore.name
+    ExTwilio.Message.create(to: number, from: ourNumber, body: body)
+  end
+
   @doc """
   Creates a chore.
 

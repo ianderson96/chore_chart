@@ -5,6 +5,7 @@ defmodule ChoreChart.Users.User do
   @derive {Jason.Encoder, only: [:email, :full_name, :score]}
   schema "users" do
     field :email, :string
+    field :phone_number, :string
     field :full_name, :string
     field :password_hash, :string
     field :score, :integer

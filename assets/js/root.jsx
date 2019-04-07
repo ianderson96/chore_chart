@@ -273,6 +273,17 @@ class Root extends React.Component {
     });
   }
 
+  send_reminder(chore) {
+    $.ajax("/api/v1/chores/" + chore.id + "/remind", {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({ id: chore.id, name: this.state.user.full_name }),
+      success: (resp) => {
+      }
+    });
+  }
+
   render() {
     return (
       <Router>
@@ -530,6 +541,7 @@ function Chore(props) {
           Completed every {chore.complete_interval} days<br/>
           Currently assigned to: {chore.user_id}
         </p>
+        <button className="btn btn-secondary" onClick={() => root.send_reminder(chore)}>Send Reminder</button>
        <Link to={"/chores/edit"} onClick={() => root.update_chore_form(chore)}> <button className="btn btn-secondary">Edit</button></Link>
       </div>
     </div>

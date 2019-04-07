@@ -20,7 +20,7 @@ defmodule ChoreChart.MixProject do
   def application do
     [
       mod: {ChoreChart.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :ex_twilio]
     ]
   end
 
@@ -45,7 +45,8 @@ defmodule ChoreChart.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:argon2_elixir, "~> 2.0"},
       {:quantum, "~> 2.2"},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      {:ex_twilio, "~> 0.7.0"}
     ]
   end
 

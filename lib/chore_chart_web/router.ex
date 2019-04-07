@@ -17,7 +17,9 @@ defmodule ChoreChartWeb.Router do
     pipe_through(:api)
 
     resources("/users", UserController, except: [:new, :edit])
-    resources("/chores", ChoreController, except: [:new, :edit])
+    resources"/chores", ChoreController do
+      post "/remind", ChoreController, :remind, as: :remind
+    end
     resources("/usergroups", UserGroupController, except: [:new, :edit])
     post("/auth", AuthController, :authenticate)
   end
