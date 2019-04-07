@@ -48,5 +48,48 @@ Repo.insert!(%Chore{
   complete_interval: 3,
   days_passed_for_assign: 0,
   days_passed_for_complete: 0,
-  user_group_join_code: "test"
+  user_group_join_code: "test",
+  user_id: 1
+})
+
+Repo.insert!(%Chore{
+  id: 2,
+  name: "Take out the trash",
+  desc: "Replace the trash bag!",
+  completed: false,
+  value: 5,
+  assign_interval: 3,
+  complete_interval: 3,
+  days_passed_for_assign: 0,
+  days_passed_for_complete: 0,
+  user_group_join_code: "test",
+  user_id: 1
+})
+
+Repo.insert!(%Chore{
+  id: 3,
+  name: "Tidy the living room",
+  desc: "fold blankets",
+  completed: false,
+  value: 5,
+  assign_interval: 3,
+  complete_interval: 3,
+  days_passed_for_assign: 0,
+  days_passed_for_complete: 0,
+  user_group_join_code: "test",
+  user_id: 2
+})
+
+Repo.insert!(%Chore{
+  id: 4,
+  name: "Clean the Kitchen",
+  desc: "Scrub da counters",
+  completed: false,
+  value: 5,
+  assign_interval: 3,
+  complete_interval: 3,
+  days_passed_for_assign: 0,
+  days_passed_for_complete: 0,
+  user_group_join_code: "test",
+  user_id: 2
 })
