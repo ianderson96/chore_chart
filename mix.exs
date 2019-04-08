@@ -46,7 +46,8 @@ defmodule ChoreChart.MixProject do
       {:argon2_elixir, "~> 2.0"},
       {:quantum, "~> 2.2"},
       {:timex, "~> 3.0"},
-      {:ex_twilio, "~> 0.7.0"}
+      {:ex_twilio, "~> 0.7.0"},
+      {:distillery, "~> 2.0"}
     ]
   end
 
